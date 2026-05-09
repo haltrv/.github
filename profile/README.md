@@ -1,5 +1,14 @@
 # Special Interest Group for Home Assistant on RISC-V
 
+## Discussion and contributions
+
+Patches should go to upstream directly where possible. If upstream is not interested or the patch is specifically not for upstream then discuss on IRC/matrix and we can add it to a branch on the repository.
+
+* #### Matrix
+  - https://matrix.to/#/#haltrv:matrix.org
+* #### IRC
+  - [ircs://irc.libera.chat/homeassistant](https://web.libera.chat/gamja/#homeassistant)
+
 ## General steps for building
 
 Not all of the following dependency order must be followed in sequence. It is possible to skip up to whichever repository fork you are interested in and then any previous dependencies for it will refer to the published haltrv build.
@@ -7,7 +16,7 @@ Not all of the following dependency order must be followed in sequence. It is po
 Assumed that you will have:
 1. GitHub personal or organization account referred to as _myusername_
 2. [RISE RISC-V runners (personal)](https://github.com/apps/rise-risc-v-runners-personal) or [RISE RISC-V runners (organization)](https://github.com/apps/rise-risc-v-runners) installed as appropriate to _myusername_ GitHub Apps settings
-3. SSH rsync access `wheelsuser`@`wheelshost`:`/home/wheelsuser/public_html` to a TLS-enabled (e.g. Lets Encrypt) IPv4 (GitHub does not have any IPv6 support) webhost referred to as _https://${wheelshost}/~${wheelsuser}_ with ~1GB storage
+3. SSH rsync access `wheelsuser`@`wheelshost`:`/home/wheelsuser/public_html` to a TLS-enabled (e.g. Lets Encrypt) IPv4 (GitHub does not have any IPv6 support) webhost referred to as https://`wheelshost`/\~`wheelsuser` with ~1GB storage
 
 ### Dependency order:
 * #### cosign-installer
@@ -60,6 +69,10 @@ Assumed that you will have:
   - Publish a new release having selected option to create from the push branch name target a new unique tag name on publish
 * #### docker-base
   - [Fork the upstream repository home-assistant/docker-base](https://github.com/home-assistant/docker-base/fork) to your GitHub account
+  - Configure your _Actions secrets and variables_ for passing the self-hosted PEP503 index URL input that sets the PIP_EXTRA_INDEX_URL and UV_EXTRA_INDEX_URL environment for built alpine (and python) docker-base image outputs
+    <br />(_docker-base repository : Settings : Security and quality : Secrets and variables : Actions : Actions secrets and variables_)
+    - (_Variables : Repository variables_)
+      <br />EXTRA_INDEX_URL: https://`wheelshost`/\~`wheelsuser`/musllinux-index
   - Apply patches to a clone of your fork of upstream repository and push new branch:
     ```
     # clone your GitHub fork of upstream repository with your ssh URL:
@@ -71,11 +84,11 @@ Assumed that you will have:
     git -C docker-base.git rebase -i origin/HEAD  # (optional) review patches to pick, edit, or drop
     git -C docker-base.git push origin mybranch
     ```
-
   - Enable workflows in actions of your GitHub repository fork with additional RISE RISC-V runners
     <br/>(_docker-base repository : Settings : General : Code and automation : Actions : General : Actions permissions : **Allow all actions and reusable workflows**_)
-  - Trigger the build in GitHub actions by publishing a new release having selected option to create from the push branch name target a new unique tag name on publish
-
+  - Trigger the build in GitHub actions by publishing a new release having selected option to create from the push branch name target a new unique tag name on publish.
+  - Re-run on completion to resolve the initial build annotations
+    <br />"_Build ${arch} image: Image verification failed for ghcr.io/myusername/${ARCH}-base-${target}:24.04, ignoring_"
 * #### wheels
 * #### docker
 * #### go2rtc
