@@ -90,6 +90,26 @@ Assumed that you will have:
   - Re-run on completion to resolve the initial build annotations
     <br />"_Build ${arch} image: Image verification failed for ghcr.io/myusername/${ARCH}-base-${target}:24.04, ignoring_"
 * #### wheels
+  - [Fork the upstream repository home-assistant/wheels](https://github.com/home-assistant/wheels/fork) to your GitHub account
+  - Configure your _Actions secrets and variables_ for passing the self-hosted PEP503 index URL and parent directory URL inputs that set the workflows Build Docker image ARG PIP_EXTRA_INDEX_URL override and actions builder 'wheels-index' parameter, respectively.
+    <br />(_wheels repository : Settings : Security and quality : Secrets and variables : Actions : Actions secrets and variables_)
+    - (_Variables : Repository variables_)
+      <br />EXTRA_INDEX_URL: https://`wheelshost`/\~`wheelsuser`/musllinux-index
+      <br />WHEELS_INDEX: https://`wheelshost`/\~`wheelsuser`
+  - Apply patches to a clone of your fork of upstream repository and push new branch:
+    ```
+    # clone your GitHub fork of upstream repository with your ssh URL:
+    git clone git@github.com:myusername/wheels.git wheels.git
+    git -C wheels.git remote add haltrv https://github.com/haltrv/wheels.git
+    git -C wheels.git fetch --all
+    git -C wheels.git checkout -b mybranch --track origin/HEAD
+    git -C wheels.git cherry-pick haltrv/HEAD..haltrv/next
+    git -C wheels.git rebase -i origin/HEAD  # (optional) review patches to pick, edit, or drop
+    git -C wheels.git push origin mybranch
+    ```
+  - Enable workflows in actions of your GitHub repository fork with additional RISE RISC-V runners
+    <br/>(_wheels repository : Settings : General : Code and automation : Actions : General : Actions permissions : **Allow all actions and reusable workflows**_)
+  - Trigger the build in GitHub actions by publishing a new release having selected option to create from the push branch name target a new unique tag name on publish.
 * #### docker
 * #### go2rtc
 * #### core
