@@ -128,5 +128,30 @@ Wheels webhost `wheelshost` configuration (required for 'docker' and 'core'):
     <br/>(_wheels repository : Settings : General : Code and automation : Actions : General : Actions permissions : **Allow all actions and reusable workflows**_)
   - Trigger the build in GitHub actions by publishing a new release having selected option to create from the push branch name target a new unique tag name on publish.
 * #### docker
+  - [Fork the upstream repository home-assistant/docker](https://github.com/home-assistant/docker/fork) to your GitHub account
+  - Configure your _Actions secrets and variables_ for the SSH private key by secret and wheels-\* inputs by vars to the wheels actions builder.
+    <br />(_docker repository : Settings : Security and quality : Secrets and variables : Actions : Actions secrets and variables_)
+    - (_Secrets : Repository secrets_)
+      <br />WHEELS_KEY: contents of `wheelsuser` ssh account id_rsa at `wheelshost` for wheels content rsync over ssh
+    - (_Variables : Repository variables_)
+      <br />WHEELS_HOST: `wheelshost`
+      <br />WHEELS_HOST_PATH: /home/`wheelsuser`/public_html
+      <br />WHEELS_INDEX: https://`wheelshost`/\~`wheelsuser`
+      <br />WHEELS_USER: `wheelsuser`
+  - Apply patches to a clone of your fork of upstream repository and push new branch:
+    ```
+    # clone your GitHub fork of upstream repository with your ssh URL:
+    git clone git@github.com:myusername/docker.git docker.git
+    git -C docker.git remote add haltrv https://github.com/haltrv/docker.git
+    git -C docker.git fetch --all
+    git -C docker.git checkout -b mybranch --track origin/HEAD
+    git -C docker.git cherry-pick haltrv/HEAD..haltrv/next
+    git -C docker.git rebase -i origin/HEAD  # (optional) review patches to pick, edit, or drop
+    git -C docker.git push origin mybranch
+    ```
+  - Enable workflows in actions of your GitHub repository fork with additional RISE RISC-V runners
+    <br/>(_docker repository : Settings : General : Code and automation : Actions : General : Actions permissions : **Allow all actions and reusable workflows**_)
+  - Trigger the build in GitHub actions by publishing a new release having selected option to create from the push branch name target a new unique tag name on publish.
+  - Workaround patch wheels/builder-rsync-remote-exec-index-509 avoids a failure "ERROR: No matching distribution found for faust-cchardet==2.1.19" by following the rsync command in wheels builder with remote exec of index-509 utility to build the index to the recently transferred files. The alternative would be to manually run this utility to build the index and then re-run all jobs.
 * #### go2rtc
 * #### core
