@@ -18,6 +18,23 @@ Assumed that you will have:
 2. [RISE RISC-V runners (personal)](https://github.com/apps/rise-risc-v-runners-personal) or [RISE RISC-V runners (organization)](https://github.com/apps/rise-risc-v-runners) installed as appropriate to _myusername_ GitHub Apps settings
 3. SSH rsync access `wheelsuser`@`wheelshost`:`/home/wheelsuser/public_html` to a TLS-enabled (e.g. Lets Encrypt) IPv4 (GitHub does not have any IPv6 support) webhost referred to as https://`wheelshost`/\~`wheelsuser` with ~1GB storage
 
+Wheels webhost `wheelshost` configuration (required for 'docker' and 'core'):
+- Upload location should be HTTPS-accessible webroot with ssh rsync access and python3 environment
+- Requires indexing option with web server (apache2 mod_autoindex Options +Indexing and/or FancyIndexing, or nginx autoindex on by default)
+- Uses SSH private key from `wheelsuser`@`wheelshost` stored as GitHub Repository Secret WHEELS_KEY
+- SSH for ${wheelsuser}@${wheelshost} must have its own pubkey (of that private key) present in authorized_hosts
+  ```
+  umask 0077
+  mkdir $HOME/public_html
+  chmod g+rx,o+rx $HOME $HOME/public_html
+  cat .ssh/id_rsa.pub >> .ssh/authorized_keys
+  python3 -m venv $HOME/venvdir
+  source $HOME/venvdir/bin/activate
+  pip install index-503
+  deactivate
+  ```
+- Manual indexing to be performed post-build with use of index-503 utility program from pypi, e.g. for `/wheelsdir` index-url builds an index `/wheelsdir/musllinux-index` from existing uploaded wheel files in directory `/wheelsdir/musllinux` ; then to re-run the build after the index is generated so that the build may use the index.
+
 ### Dependency order:
 * #### cosign-installer
   - [Fork the upstream repository sigstore/cosign-installer](https://github.com/sigstore/cosign-installer/fork) to your GitHub account
