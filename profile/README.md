@@ -154,4 +154,18 @@ Wheels webhost `wheelshost` configuration (required for 'docker' and 'core'):
   - Trigger the build in GitHub actions by publishing a new release having selected option to create from the push branch name target a new unique tag name on publish.
   - Workaround patch wheels/builder-rsync-remote-exec-index-509 avoids a failure "ERROR: No matching distribution found for faust-cchardet==2.1.19" by following the rsync command in wheels builder with remote exec of index-509 utility to build the index to the recently transferred files. The alternative would be to manually run this utility to build the index and then re-run all jobs.
 * #### go2rtc
+  Related issue: https://github.com/AlexxIT/go2rtc/issues/2250 "Add RISC-V to build"
+  - [Fork the upstream repository AlexxIT/go2rtc](https://github.com/AlexxIT/go2rtc/fork) to your GitHub account
+  - Apply patches to a clone of your fork of upstream repository and push new branch:
+    ```
+    # clone your GitHub fork of upstream repository with your ssh URL:
+    git clone git@github.com:myusername/go2rtc.git go2rtc.git
+    git -C go2rtc.git remote add haltrv https://github.com/haltrv/AlexxIT-go2rtc.git
+    git -C go2rtc.git fetch --all
+    git -C go2rtc.git checkout -b mybranch --track haltrv/next
+    git -C go2rtc.git push origin mybranch
+    ```
+  - Enable workflows in actions of your GitHub repository fork with default runners
+    <br/>(_go2rtc repository : Settings : General : Code and automation : Actions : General : Actions permissions : **Allow all actions and reusable workflows**_)
+  - Trigger the build in GitHub actions by publishing a new release having selected option to create from the push branch name target a new unique tag name on publish; the new unique tag name must begin with 'v' prefix to trigger the workflows build e.g. v1.9.100
 * #### core
